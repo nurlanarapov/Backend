@@ -1,6 +1,6 @@
 ﻿namespace BackEnd.Services.Authentication
 {
-    public class AuthenticationService : IAuthenticationService
+    public class AuthenticationService //: IAuthenticationService
     {
         
     }

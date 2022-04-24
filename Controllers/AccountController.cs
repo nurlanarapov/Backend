@@ -15,9 +15,6 @@ namespace BackEnd.Controllers
             _userManager = userManager;
         }
 
-        public Task<IActionResult> LoginAsync()
-        {
-
-        }
+        
     }
 }
