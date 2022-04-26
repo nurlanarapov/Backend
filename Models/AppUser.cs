@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace BackEnd.Models
@@ -29,5 +30,11 @@ namespace BackEnd.Models
         /// </summary>
         [MaxLength(100)]
         public string MiddleName { get; set; }
+
+        /// <summary>
+        /// Токены пользователя
+        /// </summary>
+        public ICollection<RefreshTokens> RefreshTokens { get; set; }
+
     }
 }

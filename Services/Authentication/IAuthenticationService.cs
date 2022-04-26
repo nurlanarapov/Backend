@@ -8,6 +8,7 @@ namespace BackEnd.Services.Authentication
 {
     public interface IAuthenticationService
     {
-        JwtToken LoginAsync(string UserName, string Password);
+       // JwtToken LoginAsync(string UserName, string Password);
+       // bool LogoutAsync(string RefreshToken);
     }
 }

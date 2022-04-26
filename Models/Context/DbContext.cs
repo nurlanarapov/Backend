@@ -9,6 +9,7 @@ namespace BackEnd.Models.context
         {
 
         }
+        DbSet<RefreshTokens> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
