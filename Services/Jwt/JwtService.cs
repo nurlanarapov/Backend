@@ -7,12 +7,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace BackEnd.Helpers.Managers
+namespace BackEnd.Services.Jwt
 {
     /// <summary>
     /// Менеджер по Jwt токену
     /// </summary>
-    public class JwtManager : IJwtManager  {
+    public class JwtService : IJwtService  {
 
         #region variables
         
@@ -29,7 +29,7 @@ namespace BackEnd.Helpers.Managers
         /// Конструктор
         /// </summary>
         /// <param name="jwtOptions"></param>
-        public JwtManager(JwtOptions jwtOptions)
+        public JwtService(JwtOptions jwtOptions)
         {
             _jwtOptions = jwtOptions;
         }
@@ -85,7 +85,7 @@ namespace BackEnd.Helpers.Managers
         /// </summary>
         /// <param name="token">токен</param>
         /// <returns></returns>
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string AccessToken)
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string AccessToken)
         {
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -112,7 +112,7 @@ namespace BackEnd.Helpers.Managers
     /// <summary>
     /// Менеджер по Jwt токену
     /// </summary>
-    public interface IJwtManager
+    public interface IJwtService
     {
         /// <summary>
         /// Генерация AccessToken
@@ -124,8 +124,15 @@ namespace BackEnd.Helpers.Managers
         /// <summary>
         /// Генерация токена обновителя по AccessToken
         /// </summary>
-        /// <param name="AccessToken"></param>
+        /// <param name="AccessToken">AccessToken</param>
         /// <returns></returns>
         string GenerateRefreshToken(string AccessToken);
+
+        /// <summary>
+        /// Получить ClaimsPrincipial из AccessToken
+        /// </summary>
+        /// <param name="AccessToken">AccessToken</param>
+        /// <returns></returns>
+        ClaimsPrincipal GetPrincipalFromExpiredToken(string AccessToken);
     }
 }

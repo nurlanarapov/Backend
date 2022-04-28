@@ -1,4 +1,4 @@
-using BackEnd.Models.context;
+using BackEnd.Models.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BackEnd.Data.Authentication;
+using BackEnd.Services.Jwt;
 
 namespace BackEnd
 {
@@ -29,6 +31,14 @@ namespace BackEnd
                 options.UseSqlServer(Configuration.GetConnectionString("Dev"));
             });
 
+            JwtOptions jwtOptions = new JwtOptions()
+            {
+                Key = Configuration["Jwt:Key"],
+                Issuer = Configuration["Jwt:Issuer"],
+                Audience = Configuration["Jwt:Audience"],
+                AccessTokenLifeTime = int.Parse(Configuration["Jwt:AccessTokenLifeTime"]),
+                RefreshTokenLifeTime = int.Parse(Configuration["Jwt:RefreshTokenLifeTime"]),
+            };
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters()
@@ -37,12 +47,13 @@ namespace BackEnd
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    ValidIssuer = jwtOptions.Issuer,
+                    ValidAudience = jwtOptions.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
                 };
             });
-
+            services.AddSingleton<IJwtService, JwtService>(x => new JwtService(jwtOptions));
+            services.AddSingleton<IJwtService, JwtService>(x => new JwtService(jwtOptions));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

@@ -33,6 +33,6 @@ namespace BackEnd.Data.Authentication
         /// <summary>
         /// Срок активности в минутах
         /// </summary>
-        public int RefreshTokeLifeTime { get; set; }
+        public int RefreshTokenLifeTime { get; set; }
     }
 }

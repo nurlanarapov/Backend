@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace BackEnd.Models.context
+namespace BackEnd.Models.Context
 {
     public class AppDbContext : IdentityDbContext<AppUser>
     {
@@ -9,7 +9,7 @@ namespace BackEnd.Models.context
         {
 
         }
-        DbSet<RefreshTokens> RefreshTokens { get; set; }
+        public DbSet<RefreshTokens> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
