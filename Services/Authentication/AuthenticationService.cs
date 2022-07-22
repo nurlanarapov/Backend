@@ -20,7 +20,7 @@ namespace BackEnd.Services.Authentication
         /// <summary>
         /// Jwt Менеджер
         /// </summary>
-        private JwtService _jwtService{ get; set; }
+        private IJwtService _jwtService{ get; set; }
 
         /// <summary>
         /// Конфигурация Jwt Токена
@@ -46,8 +46,8 @@ namespace BackEnd.Services.Authentication
 
         #region constructor
 
-        public AuthenticationService(JwtOptions jwtOptions, 
-                                     JwtService jwtService, 
+        public AuthenticationService(JwtOptions jwtOptions,
+                                     IJwtService jwtService, 
                                      UserManager<AppUser> userManager,
                                      SignInManager<AppUser> signInManager,
                                      AppDbContext appDbContext)
@@ -71,7 +71,7 @@ namespace BackEnd.Services.Authentication
         /// <returns>JwtToken</returns>
         public async Task<JwtToken> AuthenticateAsync(string UserName, string Password)
         {
-           AppUser appUser = await _userManager.FindByNameAsync(UserName);
+            AppUser appUser = await _userManager.FindByNameAsync(UserName);
             if (appUser is null)
                 throw new AuthenticationException("Login or Password failed");
 
@@ -79,14 +79,7 @@ namespace BackEnd.Services.Authentication
             if(!result.Succeeded)
                 throw new AuthenticationException("Login or Password failed");
 
-            IEnumerable<Claim> claims = new Claim[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, appUser.UserName, ClaimValueTypes.String),
-                new Claim(ClaimTypes.Name, appUser.Name, ClaimValueTypes.String),
-                new Claim(ClaimTypes.Email, appUser.Email, ClaimValueTypes.String)
-            };
-
-            string accessToken = _jwtService.GenerateAccessToken(claims);
+            string accessToken = GenerateAccessToken(appUser);
             string refreshToken = _jwtService.GenerateRefreshToken(accessToken);
 
             RefreshTokens refreshTokens = new RefreshTokens()
@@ -104,7 +97,6 @@ namespace BackEnd.Services.Authentication
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             };
-
         }
 
         /// <summary>
@@ -126,39 +118,78 @@ namespace BackEnd.Services.Authentication
                 throw new SecurityTokenException("Invalid token");
 
             _appDbContext.RefreshTokens.Remove(refreshToken);
-            return _appDbContext.SaveChanges() > 0;             
+
+            if (_appDbContext.SaveChanges() <= 0)
+                throw new Exception();
+
+            return true;             
         }
 
-        #endregion
-    }
-
-    /// <summary>
-    /// Интерфейс 
-    /// </summary>
-    public interface IAuthenticationService
-    {
         /// <summary>
-        /// Авторизация
-        /// </summary>
-        /// <param name="UserName">Имя пользователя</param>
-        /// <param name="Password">Пароль</param>
-        /// <returns></returns>
-        Task<JwtToken> AuthenticateAsync(string UserName, string Password);
-
-        /// <summary>
-        /// Invoke Token
-        /// </summary>
-        /// <param name="AccessToken">AccessToken</param>
-        /// <param name="RefreshToken">RefreshToken</param>
-        /// <returns></returns>
-        Task<bool> InvokeAsync(string AccessToken, string RefreshToken);
-
-        /// <summary>
-        /// Обновить токен по RefreshToken
+        /// Обновить токен
         /// </summary>
         /// <param name="AccessToken"></param>
         /// <param name="RefreshToken"></param>
         /// <returns></returns>
-        //Task<JwtToken> RefreshToken(string AccessToken, string RefreshToken);
+        /// <exception cref="SecurityTokenException">Invalid token</exception>
+        /// <exception cref="Exception">Error in insert db</exception>
+        public async Task<JwtToken> RefreshToken(string AccessToken, string RefreshToken)
+        {
+            ClaimsPrincipal claimsPrincipal = _jwtService.GetPrincipalFromExpiredToken(AccessToken);
+
+            AppUser appUser = await _userManager.GetUserAsync(claimsPrincipal);
+            
+            if (appUser is null)
+                throw new SecurityTokenException("Invalid token");
+
+            RefreshTokens refreshToken = appUser.RefreshTokens.FirstOrDefault(x => x.RefreshToken.Equals(RefreshToken) 
+                                                                               && !x.Revoked);
+
+            if (refreshToken is null)
+                throw new SecurityTokenException("Invalid refresh token");
+
+            appUser.RefreshTokens.Remove(refreshToken);
+
+            string accessToken = GenerateAccessToken(appUser);
+
+            refreshToken = new RefreshTokens()
+            {
+                RefreshToken = _jwtService.GenerateRefreshToken(accessToken),
+                ExpiryDate = DateTime.Now.AddDays(_jwtOptions.RefreshTokenLifeTime),
+                Create = DateTime.Now,
+                UserId = appUser.Id
+            };
+
+            _appDbContext.RefreshTokens.Add(refreshToken);
+
+            if (_appDbContext.SaveChanges() <= 0)
+                throw new Exception();
+
+            JwtToken jwtToken = new JwtToken()
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.RefreshToken
+            };
+
+            return jwtToken;
+        }
+
+        /// <summary>
+        /// Сгенерировать токен для данного пользователя
+        /// </summary>
+        /// <param name="appUser"></param>
+        /// <returns></returns>
+        private string GenerateAccessToken(AppUser appUser)
+        {
+            IEnumerable<Claim> claims = new Claim[]
+           {
+                new Claim(ClaimTypes.NameIdentifier, appUser.UserName, ClaimValueTypes.String),
+                new Claim(ClaimTypes.Name, appUser.Name, ClaimValueTypes.String),
+                new Claim(ClaimTypes.Email, appUser.Email, ClaimValueTypes.String)
+           };
+           return _jwtService.GenerateAccessToken(claims);
+        }
+
+        #endregion
     }
 }

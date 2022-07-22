@@ -50,7 +50,7 @@ namespace BackEnd.Services.Jwt
             var token = new JwtSecurityToken(_jwtOptions.Issuer,
               _jwtOptions.Audience,
               claim,
-              expires: DateTime.Now.AddDays(_jwtOptions.AccessTokenLifeTime),
+              expires: DateTime.Now.AddMinutes(_jwtOptions.AccessTokenLifeTime),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -107,32 +107,5 @@ namespace BackEnd.Services.Jwt
         }
         
         #endregion
-    }
-
-    /// <summary>
-    /// Менеджер по Jwt токену
-    /// </summary>
-    public interface IJwtService
-    {
-        /// <summary>
-        /// Генерация AccessToken
-        /// </summary>
-        /// <param name="claim">Claims</param>
-        /// <returns></returns>
-        string GenerateAccessToken(IEnumerable<Claim> claim);
-
-        /// <summary>
-        /// Генерация токена обновителя по AccessToken
-        /// </summary>
-        /// <param name="AccessToken">AccessToken</param>
-        /// <returns></returns>
-        string GenerateRefreshToken(string AccessToken);
-
-        /// <summary>
-        /// Получить ClaimsPrincipial из AccessToken
-        /// </summary>
-        /// <param name="AccessToken">AccessToken</param>
-        /// <returns></returns>
-        ClaimsPrincipal GetPrincipalFromExpiredToken(string AccessToken);
     }
 }

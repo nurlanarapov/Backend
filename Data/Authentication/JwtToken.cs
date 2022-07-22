@@ -9,6 +9,7 @@
         /// AccessTOken
         /// </summary>
         public string AccessToken { get; set; }
+
         /// <summary>
         /// RefreshToken токен обновитель
         /// </summary>

@@ -11,6 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BackEnd.Data.Authentication;
 using BackEnd.Services.Jwt;
+using BackEnd.Services.Authentication;
+using Microsoft.AspNetCore.Identity;
+using BackEnd.Models;
 
 namespace BackEnd
 {
@@ -29,7 +32,14 @@ namespace BackEnd
             services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Dev"));
-            });
+            }, ServiceLifetime.Singleton);
+
+            services.AddIdentityCore<AppUser>()
+                    .AddUserManager<UserManager<AppUser>>()
+                    .AddRoles<IdentityRole>()
+                    .AddSignInManager<SignInManager<AppUser>>()
+                    .AddRoleManager<RoleManager<IdentityRole>>()
+                    .AddEntityFrameworkStores<AppDbContext>();
 
             JwtOptions jwtOptions = new JwtOptions()
             {
@@ -39,6 +49,8 @@ namespace BackEnd
                 AccessTokenLifeTime = int.Parse(Configuration["Jwt:AccessTokenLifeTime"]),
                 RefreshTokenLifeTime = int.Parse(Configuration["Jwt:RefreshTokenLifeTime"]),
             };
+
+            services.AddSingleton<JwtOptions>(x => jwtOptions);
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters()
@@ -52,9 +64,11 @@ namespace BackEnd
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
                 };
             });
-            services.AddSingleton<IJwtService, JwtService>(x => new JwtService(jwtOptions));
-            services.AddSingleton<IJwtService, JwtService>(x => new JwtService(jwtOptions));
+            services.AddTransient<IJwtService, JwtService>(x => new JwtService(jwtOptions));
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
+
             services.AddControllers();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BackEnd", Version = "v1" });
@@ -70,9 +84,7 @@ namespace BackEnd
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BackEnd v1"));
             }
-
             app.UseHttpsRedirection();
-
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
