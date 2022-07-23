@@ -49,9 +49,13 @@ namespace BackEnd.Controllers
         {
             try
             {
-                _logger.LogInformation("Выполнен вход");
-                JwtToken jwtToken = await _authenticationService.AuthenticateAsync(login.UserName, login.Password);
-                return Ok(jwtToken); 
+                if(ModelState.IsValid){
+                    _logger.LogInformation("Выполнен вход");
+                    JwtToken jwtToken = await _authenticationService.AuthenticateAsync(login.userName, login.password);
+                    return Ok(jwtToken);
+                }
+                return BadRequest(ModelState);
+                
             }
             catch (AuthenticationException ex)
             {

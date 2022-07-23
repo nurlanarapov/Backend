@@ -1,8 +1,26 @@
-﻿namespace BackEnd.Data.Authentication
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
+namespace BackEnd.Data.Authentication
 {
+    /// <summary>
+    /// Данные для авторизации
+    /// </summary>
     public class Login
     {
-        public string UserName { get; set; }
-        public string Password { get; set; }
+        /// <summary>
+        /// Логин
+        /// </summary>
+        [Required(ErrorMessage = "Введите логин")]
+        [JsonPropertyName("userName")]
+        public string userName { get; set; }
+
+        /// <summary>
+        /// Пароль
+        /// </summary>
+        [Required(ErrorMessage = "Введите пароль")]
+        [JsonPropertyName("password")]
+        public string password { get; set; }
     }
 }
