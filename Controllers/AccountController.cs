@@ -3,6 +3,7 @@ using BackEnd.Models;
 using BackEnd.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
@@ -17,10 +18,13 @@ namespace BackEnd.Controllers
 
         private IAuthenticationService _authenticationService;
 
-        public AccountController(UserManager<AppUser> userManager, IAuthenticationService authenticationService)
+        private readonly ILogger<AccountController> _logger;
+
+        public AccountController(UserManager<AppUser> userManager, IAuthenticationService authenticationService, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             _authenticationService = authenticationService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -45,6 +49,7 @@ namespace BackEnd.Controllers
         {
             try
             {
+                _logger.LogInformation("Выполнен вход");
                 JwtToken jwtToken = await _authenticationService.AuthenticateAsync(login.UserName, login.Password);
                 return Ok(jwtToken); 
             }
