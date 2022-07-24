@@ -10,7 +10,6 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using Data = Identity.API.Data.Authentication;
 
 namespace Identity.API.Controllers
 {
