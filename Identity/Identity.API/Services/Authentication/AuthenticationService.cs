@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using BackEnd.Models.Context;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace BackEnd.Services.Authentication
 {
@@ -42,6 +43,8 @@ namespace BackEnd.Services.Authentication
         /// </summary>
         private AppDbContext _appDbContext { get; set; }
 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         #endregion
 
         #region constructor
@@ -50,13 +53,15 @@ namespace BackEnd.Services.Authentication
                                      IJwtService jwtService, 
                                      UserManager<AppUser> userManager,
                                      SignInManager<AppUser> signInManager,
-                                     AppDbContext appDbContext)
+                                     AppDbContext appDbContext,
+                                     IHttpContextAccessor httpContextAccessor)
         {
             _jwtService = jwtService;
             _jwtOptions = jwtOptions;
             _userManager = userManager;
             _singInManager = signInManager;
             _appDbContext = appDbContext;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         #endregion
@@ -95,7 +100,8 @@ namespace BackEnd.Services.Authentication
             return new JwtToken()
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                ExpiryDate = refreshTokens.ExpiryDate
             };
         }
 
@@ -105,13 +111,11 @@ namespace BackEnd.Services.Authentication
         /// <param name="AccessToken"></param>
         /// <param name="RefreshToken"></param>
         /// <returns></returns>
-        public async Task<bool> InvokeAsync(string AccessToken, string RefreshToken)
-        {
-            ClaimsPrincipal claimsPrincipal = _jwtService.GetPrincipalFromExpiredToken(AccessToken);
-            
-            AppUser appUser = await _userManager.GetUserAsync(claimsPrincipal);
+        public async Task<bool> InvokeAsync(string RefreshToken)
+        {            
+            AppUser appUser = await _userManager.GetUserAsync(_httpContextAccessor.HttpContext.User);
             if (appUser is null)
-                throw new SecurityTokenException("Invalid token");
+                throw new SecurityTokenException("Invalid User");
 
             RefreshTokens refreshToken = _appDbContext.RefreshTokens.FirstOrDefault(x => x.RefreshToken == RefreshToken);
             if(refreshToken is null)
@@ -163,12 +167,13 @@ namespace BackEnd.Services.Authentication
             _appDbContext.RefreshTokens.Add(refreshToken);
 
             if (_appDbContext.SaveChanges() <= 0)
-                throw new Exception();
+                throw new Exception("Error in service");
 
             JwtToken jwtToken = new JwtToken()
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken.RefreshToken
+                RefreshToken = refreshToken.RefreshToken,
+                ExpiryDate = refreshToken.ExpiryDate
             };
 
             return jwtToken;
@@ -183,8 +188,8 @@ namespace BackEnd.Services.Authentication
         {
             IEnumerable<Claim> claims = new Claim[]
            {
-                new Claim(ClaimTypes.NameIdentifier, appUser.UserName, ClaimValueTypes.String),
-                new Claim(ClaimTypes.Name, appUser.Name, ClaimValueTypes.String),
+                new Claim(ClaimTypes.NameIdentifier, appUser.Id, ClaimValueTypes.String),
+                new Claim(ClaimTypes.Name, appUser.UserName, ClaimValueTypes.String),
                 new Claim(ClaimTypes.Email, appUser.Email, ClaimValueTypes.String)
            };
            return _jwtService.GenerateAccessToken(claims);

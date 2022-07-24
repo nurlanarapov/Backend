@@ -2,7 +2,7 @@ using Xunit;
 
 namespace BackendTesting
 {
-    public class AccountController
+    public class AccountControllerTest
     {
         [Fact]
         public void Index()

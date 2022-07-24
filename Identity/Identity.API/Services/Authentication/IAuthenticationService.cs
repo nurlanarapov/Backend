@@ -22,7 +22,7 @@ namespace BackEnd.Services.Authentication
         /// <param name="AccessToken">AccessToken</param>
         /// <param name="RefreshToken">RefreshToken</param>
         /// <returns></returns>
-        Task<bool> InvokeAsync(string AccessToken, string RefreshToken);
+        Task<bool> InvokeAsync(string RefreshToken);
 
         /// <summary>
         /// Обновить токен по RefreshToken

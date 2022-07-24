@@ -14,6 +14,7 @@ using BackEnd.Services.Jwt;
 using BackEnd.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
 using BackEnd.Models;
+using System.Security.Claims;
 
 namespace BackEnd
 {
@@ -33,13 +34,14 @@ namespace BackEnd
             {
                 options.UseSqlServer(Configuration.GetConnectionString("Dev"));
             }, ServiceLifetime.Singleton);
-
+            services.AddHttpContextAccessor();
             services.AddIdentityCore<AppUser>()
                     .AddUserManager<UserManager<AppUser>>()
                     .AddRoles<IdentityRole>()
                     .AddSignInManager<SignInManager<AppUser>>()
                     .AddRoleManager<RoleManager<IdentityRole>>()
                     .AddEntityFrameworkStores<AppDbContext>();
+            services.Configure<IdentityOptions>(options => options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier);
 
             JwtOptions jwtOptions = new JwtOptions()
             {
@@ -57,8 +59,6 @@ namespace BackEnd
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtOptions.Issuer,
                     ValidAudience = jwtOptions.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
