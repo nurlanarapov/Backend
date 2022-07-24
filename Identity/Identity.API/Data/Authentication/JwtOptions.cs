@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackEnd.Data.Authentication
+namespace Identity.API.Data.Authentication
 {
     /// <summary>
     /// Опции Jwt токена

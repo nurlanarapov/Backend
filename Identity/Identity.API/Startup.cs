@@ -1,4 +1,3 @@
-using BackEnd.Models.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,12 +8,15 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using BackEnd.Data.Authentication;
 using BackEnd.Services.Jwt;
-using BackEnd.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
-using BackEnd.Models;
 using System.Security.Claims;
+using Identity.API.Services;
+using Identity.API.Services.Authentication;
+using Identity.API.Data.Authentication;
+using Identity.API.Models;
+using Identity.API.Models.Context;
+using Identity.API.Services.User;
 
 namespace BackEnd
 {
@@ -41,6 +43,8 @@ namespace BackEnd
                     .AddSignInManager<SignInManager<AppUser>>()
                     .AddRoleManager<RoleManager<IdentityRole>>()
                     .AddEntityFrameworkStores<AppDbContext>();
+            services.AddTransient<UserInfoService>();
+
             services.Configure<IdentityOptions>(options => options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier);
 
             JwtOptions jwtOptions = new JwtOptions()
@@ -64,6 +68,7 @@ namespace BackEnd
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
                 };
             });
+
             services.AddTransient<IJwtService, JwtService>(x => new JwtService(jwtOptions));
             services.AddTransient<IAuthenticationService, AuthenticationService>();
 

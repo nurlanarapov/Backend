@@ -1,18 +1,18 @@
-﻿using BackEnd.Data.Authentication;
-using BackEnd.Services.Jwt;
-using Microsoft.AspNetCore.Identity;
-using BackEnd.Models;
+﻿using BackEnd.Services.Jwt;
 using System.Threading.Tasks;
 using System;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Collections.Generic;
-using BackEnd.Models.Context;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Identity.API.Data.Authentication;
+using Microsoft.AspNetCore.Identity;
+using Identity.API.Models;
+using Identity.API.Models.Context;
 
-namespace BackEnd.Services.Authentication
+namespace Identity.API.Services.Authentication
 {
     public class AuthenticationService : IAuthenticationService
     {
@@ -92,7 +92,8 @@ namespace BackEnd.Services.Authentication
                 RefreshToken = refreshToken,
                 ExpiryDate = DateTime.Now.AddDays(_jwtOptions.RefreshTokenLifeTime),
                 Create = DateTime.Now,
-                UserId = appUser.Id
+                UserId = appUser.Id,
+                Device = _httpContextAccessor.HttpContext.Request.Headers.UserAgent
             };
             _appDbContext.RefreshTokens.Add(refreshTokens);
             _appDbContext.SaveChanges();
@@ -161,7 +162,8 @@ namespace BackEnd.Services.Authentication
                 RefreshToken = _jwtService.GenerateRefreshToken(accessToken),
                 ExpiryDate = DateTime.Now.AddDays(_jwtOptions.RefreshTokenLifeTime),
                 Create = DateTime.Now,
-                UserId = appUser.Id
+                UserId = appUser.Id,
+                Device = _httpContextAccessor.HttpContext.Request.Headers.UserAgent
             };
 
             _appDbContext.RefreshTokens.Add(refreshToken);

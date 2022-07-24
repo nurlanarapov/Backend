@@ -1,7 +1,7 @@
-﻿using BackEnd.Data.Authentication;
+﻿using Identity.API.Data.Authentication;
 using System.Threading.Tasks;
 
-namespace BackEnd.Services.Authentication
+namespace Identity.API.Services
 {
     /// <summary>
     /// Интерфейс авторизации

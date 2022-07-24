@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace BackEnd.Models
+namespace Identity.API.Models
 {
     /// <summary>
     /// Токены обновители
@@ -46,11 +47,18 @@ namespace BackEnd.Models
         private bool IsActive => DateTime.Now > ExpiryDate && !Revoked;
 
         /// <summary>
+        /// Устройство
+        /// </summary>
+        public string Device { get; set; }
+
+        /// <summary>
         /// Пользователь
         /// </summary>
         [Required]
+        [JsonIgnore]
         public string UserId { get; set; }
         [ForeignKey("UserId")]
+        [JsonIgnore]
         public AppUser User { get; set; }
     }
 }

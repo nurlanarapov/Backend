@@ -1,27 +1,28 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
-namespace Identity.API.Data.Authentication
+namespace Identity.API.Shared.Account
 {
-    /// <summary>
-    /// JwtToken
-    /// </summary>
     public class JwtToken
     {
         /// <summary>
-        /// AccessToken
+        /// JwtToken
         /// </summary>
+        [JsonPropertyName("access_token")]
         public string AccessToken { get; set; }
 
         /// <summary>
         /// RefreshToken токен обновитель
         /// </summary>
+        [JsonPropertyName("refresh_token")]
         [Required(ErrorMessage = "Error in RefreshToken")]
         public string RefreshToken { get; set; }
 
         /// <summary>
         /// Срок жизни токена обновителя
         /// </summary>
+        [JsonPropertyName("expiry_date")]
         public DateTime ExpiryDate { get; set; }
     }
 }

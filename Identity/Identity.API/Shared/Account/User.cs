@@ -1,16 +1,19 @@
-using Microsoft.AspNetCore.Identity;
+п»їusing Identity.API.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Identity.API.Models
+namespace Identity.API.Shared.Account
 {
-    /// <summary>
-    /// Доп. информация пользователей
-    /// </summary>
-    public class AppUser : IdentityUser
+    public class User
     {
         /// <summary>
-        /// Имя
+        /// Id
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// РРјСЏ
         /// </summary>
         [Required]
         [MinLength(3)]
@@ -18,7 +21,7 @@ namespace Identity.API.Models
         public string Name { get; set; }
 
         /// <summary>
-        /// Фамилия
+        /// Р¤Р°РјРёР»РёСЏ
         /// </summary>
         [Required]
         [MinLength(3)]
@@ -26,15 +29,14 @@ namespace Identity.API.Models
         public string SurName { get; set; }
 
         /// <summary>
-        /// Отчество
+        /// РћС‚С‡РµСЃС‚РІРѕ
         /// </summary>
         [MaxLength(100)]
         public string MiddleName { get; set; }
 
         /// <summary>
-        /// Токены пользователя
+        /// РўРѕРєРµРЅС‹ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
         /// </summary>
         public ICollection<RefreshTokens> RefreshTokens { get; set; }
-
     }
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace BackEnd.Shared.Account
+namespace Identity.API.Shared.Account
 {
     /// <summary>
     /// Авторизация
@@ -13,11 +10,13 @@ namespace BackEnd.Shared.Account
         /// <summary>
         /// Имя пользователя
         /// </summary>
+        [Required(ErrorMessage = "Введите логин")]
         public string UserName { get; set; }
 
         /// <summary>
         /// Пароль
         /// </summary>
+        [Required(ErrorMessage = "Введите пароль")]
         public string Password { get; set; }
     }
 }
