@@ -17,6 +17,7 @@ using Identity.API.Data.Authentication;
 using Identity.API.Models;
 using Identity.API.Models.Context;
 using Identity.API.Services.User;
+using Identity.API.Middlewares.Exceptions;
 
 namespace BackEnd
 {
@@ -93,6 +94,8 @@ namespace BackEnd
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

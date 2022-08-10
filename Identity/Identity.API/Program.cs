@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using System;
 
 namespace BackEnd
 {
@@ -9,15 +10,22 @@ namespace BackEnd
     {
         public static void Main(string[] args)
         {
-            string outputTemplate = "{Timestamp:yyyy-MM-dd HH: mm: ss.fff} [{Level}] {Message} { NewLine} { Exception} TEST";
             Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-            .WriteTo.File("C:\\Logs\\Demo.txt",
-            rollingInterval: RollingInterval.Day,
-            outputTemplate: outputTemplate).CreateLogger();
-            CreateHostBuilder(args).Build().Run();
+                   .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", Serilog.Events.LogEventLevel.Warning)
+                   .WriteTo.File(path: "C:\\Logs\\log-.txt",
+                                 outputTemplate: "{Timestamp:yyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                                 rollingInterval: RollingInterval.Day,
+                                 restrictedToMinimumLevel: LogEventLevel.Information)
+                   .CreateLogger();
+            try
+            {
+                Log.Information("Сервис запускается...");
+                CreateHostBuilder(args).Build().Run();
+            }
+            catch(Exception ex)
+            {
+                Log.Fatal(ex, "Ошибка при запуске сервиса авторизации");
+            }       
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

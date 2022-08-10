@@ -169,7 +169,7 @@ namespace Identity.API.Services.Authentication
             _appDbContext.RefreshTokens.Add(refreshToken);
 
             if (_appDbContext.SaveChanges() <= 0)
-                throw new Exception("Error in service");
+                throw new Exception();
 
             JwtToken jwtToken = new JwtToken()
             {

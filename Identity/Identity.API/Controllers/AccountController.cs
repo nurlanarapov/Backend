@@ -1,4 +1,5 @@
-﻿using Identity.API.Models;
+﻿using Identity.API.Data.System;
+using Identity.API.Models;
 using Identity.API.Services;
 using Identity.API.Services.User;
 using Identity.API.Shared.Account;
@@ -18,6 +19,7 @@ namespace Identity.API.Controllers
     public class AccountController : Controller
     {
         #region variables
+
         private IAuthenticationService _authenticationService;
 
         private readonly ILogger<AccountController> _logger;
@@ -29,6 +31,7 @@ namespace Identity.API.Controllers
         #endregion
 
         #region constructor
+
         public AccountController(IAuthenticationService authenticationService,  
                                  ILogger<AccountController> logger, 
                                  IHttpContextAccessor httpContextAccessor,
@@ -58,7 +61,7 @@ namespace Identity.API.Controllers
 
                 User user = new User()
                 {
-                    Id = CurrentUser.Id,
+                     Id = CurrentUser.Id,
                      Name = CurrentUser.Name,
                      SurName = CurrentUser.SurName,
                      MiddleName = CurrentUser.MiddleName,
@@ -70,11 +73,7 @@ namespace Identity.API.Controllers
             catch (SecurityTokenException ex)
             {
                 return Unauthorized(ex.Message);
-            }
-            catch (Exception)
-            {
-               return BadRequest();
-            }            
+            }       
         }
 
         /// <summary>
@@ -89,7 +88,8 @@ namespace Identity.API.Controllers
         {
             try
             {
-                if (ModelState.IsValid) {
+                if (ModelState.IsValid)
+                {
                     Data.Authentication.JwtToken jwtToken = await _authenticationService.AuthenticateAsync(login.UserName, login.Password);
                     JwtToken token = new JwtToken()
                     {
@@ -104,10 +104,6 @@ namespace Identity.API.Controllers
             catch (AuthenticationException ex)
             {
                 return Unauthorized(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
             }
         }
 
@@ -144,10 +140,6 @@ namespace Identity.API.Controllers
             {
                 return Unauthorized(ex.Message);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         /// <summary>
@@ -169,10 +161,6 @@ namespace Identity.API.Controllers
                     return BadRequest();
             }
             catch(SecurityTokenException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }
