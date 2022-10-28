@@ -1,9 +1,8 @@
-﻿using Identity.API.Models.DbModels;
-using System;
+﻿using Identity.API.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Identity.API.Shared.Account
+namespace Identity.API.Models.DtoModels.Request
 {
     public class User
     {
@@ -11,6 +10,14 @@ namespace Identity.API.Shared.Account
         /// Id
         /// </summary>
         public string Id { get; set; }
+
+        /// <summary>
+        /// Имя
+        /// </summary>
+        [Required]
+        [MinLength(3)]
+        [MaxLength(50)]
+        public string UserName { get; set; }
 
         /// <summary>
         /// Имя
@@ -35,8 +42,20 @@ namespace Identity.API.Shared.Account
         public string MiddleName { get; set; }
 
         /// <summary>
-        /// Токены пользователя
+        /// Email
         /// </summary>
-        public ICollection<RefreshTokens> RefreshTokens { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
+
+        /// <summary>
+        /// Номер телефона
+        /// </summary>
+        [Phone]
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        [MinLength(8)]
+        [MaxLength(50)]
+        public string Password { get; set; }
     }
 }

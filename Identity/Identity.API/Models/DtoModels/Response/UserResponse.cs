@@ -1,11 +1,10 @@
 ﻿using Identity.API.Models.DbModels;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Identity.API.Shared.Account
+namespace Identity.API.Models.DtoModels.Response
 {
-    public class User
+    public class UserResponse
     {
         /// <summary>
         /// Id

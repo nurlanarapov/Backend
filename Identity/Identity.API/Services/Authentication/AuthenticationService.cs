@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Identity.API.Data.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Identity.API.Models;
-using Identity.API.Models.Context;
+using Identity.API.Models.DbModels.Context;
+using Identity.API.Models.DbModels;
+using Identity.API.Models.ServiceModels;
 
 namespace Identity.API.Services.Authentication
 {

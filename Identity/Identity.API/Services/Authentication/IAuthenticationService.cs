@@ -1,4 +1,4 @@
-﻿using Identity.API.Data.Authentication;
+﻿using Identity.API.Models.ServiceModels;
 using System.Threading.Tasks;
 
 namespace Identity.API.Services
