@@ -26,7 +26,9 @@ using System.Text;
     {
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("db"), x => x.MigrationsHistoryTable("_MigrationHistory", schema: "auth"));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("db"), 
+                               x => x.MigrationsHistoryTable("_MigrationHistory",
+                                                             schema: "auth"));
         });
         builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
